@@ -13,6 +13,7 @@ import re
 import urllib
 from bs4 import BeautifulSoup
 import nltk
+from xgoogle.browser import BrowserError
 
 try:
     from html.entities import name2codepoint
