@@ -17,6 +17,7 @@ import urllib.request
 import http.client
 import http.cookiejar
 import http.cookies
+import sys
 
 BROWSERS = (
     # Top most popular browsers in my access.log on 2009.02.12
