@@ -18,25 +18,6 @@ import http.client
 import http.cookiejar
 import http.cookies
 import sys
-from lxml.html import fromstring
-import requests
-from itertools import cycle
-import traceback
- 
-def get_proxies():
-    url = 'https://free-proxy-list.net/'
-    response = requests.get(url)
-    parser = fromstring(response.text)
-    proxies = set()
-    for i in parser.xpath('//tbody/tr')[:10]:
-        if i.xpath('.//td[7][contains(text(),"yes")]'):
-            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
-            proxies.add(proxy)
-    return proxies
- 
-
-proxies = get_proxies()
-proxy_pool = cycle(proxies)
 
 BROWSERS = (
     # Top most popular browsers in my access.log on 2009.02.12
@@ -128,7 +109,7 @@ class PoolHTTPHandler(urllib.request.HTTPHandler):
 class Browser(object):
     """Provide a simulated browser object.
     """
-    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxy_pool = proxy_pool):
+    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False):
         self.headers = {
             'User-Agent': user_agent,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -137,11 +118,11 @@ class Browser(object):
         }
         self.debug = debug
         self._cj = http.cookiejar.CookieJar()
-        self.proxy = next(proxy_pool)
+        #self.proxy = next(proxy_pool)
 
         self.handlers = [PoolHTTPHandler]
         self.handlers.append(urllib.request.HTTPCookieProcessor(self._cj))
-        self.handlers.append(urllib.request.ProxyHandler({'http': self.proxy}))
+        #self.handlers.append(urllib.request.ProxyHandler({'http': self.proxy}))
 
         self.opener = urllib.request.build_opener(*self.handlers)
         self.opener.addheaders = []
