@@ -137,7 +137,7 @@ class Browser(object):
         }
         self.debug = debug
         self._cj = http.cookiejar.CookieJar()
-        self.proxies = proxy_pool
+        self.proxies = proxies
 
         self.handlers = [PoolHTTPHandler]
         self.handlers.append(urllib.request.HTTPCookieProcessor(self._cj))
@@ -160,12 +160,13 @@ class Browser(object):
         #if data: data = urllib.urlencode(data)
         #request = urllib.request.Request(url, data, self.headers)
         self.headers['User-Agent'] = random.choice(BROWSERS)
-        proxy = {next(self.proxies)}
+        for i in range(randint(0,4)):
+            proxy = {next(self.proxies)}
         time.sleep(randint(1,5))
         r = requests.get(url,headers=self.headers,proxies = proxy)
         count = 0
         while r.status_code == 503 and count <10:
-            proxy = next(self.proxies)
+            proxy = {next(self.proxies)}
             self.headers['User-Agent'] = random.choice(BROWSERS)
             time.sleep(randint(1,5))
             r = requests.get(url,headers=self.headers,proxies = proxy)
