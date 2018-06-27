@@ -262,7 +262,7 @@ class GoogleSearch(object):
             page = self.browser.get_page(safe_url)
         except BrowserError as e:
             raise SearchError("Failed getting %s: %s" % (e.url, e.error))
-
+        
         return BeautifulSoup(page, "html.parser")
 
     def _extract_info(self, soup):
