@@ -129,7 +129,7 @@ class PoolHTTPHandler(urllib.request.HTTPHandler):
 class Browser(object):
     """Provide a simulated browser object.
     """
-    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxies = proxy_list):
+    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxies = proxies_list):
         self.headers = {
             'User-Agent': user_agent,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
