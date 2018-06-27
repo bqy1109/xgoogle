@@ -18,6 +18,25 @@ import http.client
 import http.cookiejar
 import http.cookies
 import sys
+import requests
+from lxml.html import fromstring
+from itertools import cycle
+import traceback
+import time
+
+def get_proxies():
+    url = 'https://free-proxy-list.net/'
+    response = requests.get(url)
+    parser = fromstring(response.text)
+    proxies = set()
+    for i in parser.xpath('//tbody/tr')[:10]:
+        if i.xpath('.//td[7][contains(text(),"yes")]'):
+            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
+            proxies.add(proxy)
+    return proxies
+proxies = get_proxies()
+proxy_pool = cycle(proxies)
+
 
 BROWSERS = (
     # Top most popular browsers in my access.log on 2009.02.12
@@ -109,7 +128,7 @@ class PoolHTTPHandler(urllib.request.HTTPHandler):
 class Browser(object):
     """Provide a simulated browser object.
     """
-    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False):
+    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxies = proxy_pool):
         self.headers = {
             'User-Agent': user_agent,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -118,7 +137,7 @@ class Browser(object):
         }
         self.debug = debug
         self._cj = http.cookiejar.CookieJar()
-        #self.proxy = next(proxy_pool)
+        self.proxies = proxy_pool
 
         self.handlers = [PoolHTTPHandler]
         self.handlers.append(urllib.request.HTTPCookieProcessor(self._cj))
@@ -138,27 +157,42 @@ class Browser(object):
     def get_page(self, url, data=None):
         # handlers = [PoolHTTPHandler]
         # opener = urllib.request.build_opener(*handlers)
-        if data: data = urllib.urlencode(data)
-        request = urllib.request.Request(url, data, self.headers)
-        try:
-            response = self.opener.open(request)
-            return response.read()
-        except (urllib.error.HTTPError) as e:
+        #if data: data = urllib.urlencode(data)
+        #request = urllib.request.Request(url, data, self.headers)
+        self.headers['User-Agent'] = random.choice(BROWSERS)
+        proxy = next(self.proxies)
+        time.sleep(randint(1,5))
+        r = requests.get(url,headers=self.headers,proxies = proxy)
+        count = 0
+        while r.status_code == 503 and count <10:
+            proxy = next(self.proxies)
+            self.headers['User-Agent'] = random.choice(BROWSERS)
+            time.sleep(randint(1,5))
+            r = requests.get(url,headers=self.headers,proxies = proxy)
+            
+        if r.status_code == 200:
+            return r.content
+        else:
+            return 1
+        #try:
+        #    response = self.opener.open(request)
+        #    return response.read()
+        #except (urllib.error.HTTPError) as e:
             # Check if we've reached the captcha
-            if e.code == 503:
-                print("Error: Captcha page has been reached, exiting...")
-                sys.exit(1)
-            raise BrowserError(url, str(e))
-        except (urllib.error.URLError) as e:
-            raise BrowserError(url, str(e))
-        except (socket.error, socket.sslerror) as msg:
-            raise BrowserError(url, msg)
-        except socket.timeout as e:
-            raise BrowserError(url, "timeout")
-        except KeyboardInterrupt:
-            raise
-        except:
-            raise BrowserError(url, "unknown error")
+        #    if e.code == 503:
+        #        print("Error: Captcha page has been reached, exiting...")
+        #        sys.exit(1)
+        #    raise BrowserError(url, str(e))
+        #except (urllib.error.URLError) as e:
+        #    raise BrowserError(url, str(e))
+        #except (socket.error, socket.sslerror) as msg:
+        #    raise BrowserError(url, msg)
+        #except socket.timeout as e:
+        #    raise BrowserError(url, "timeout")
+        #except KeyboardInterrupt:
+        #    raise
+        #except:
+        #    raise BrowserError(url, "unknown error")
 
     def set_random_user_agent(self):
         self.headers['User-Agent'] = random.choice(BROWSERS)
