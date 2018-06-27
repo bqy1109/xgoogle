@@ -160,7 +160,7 @@ class Browser(object):
         #if data: data = urllib.urlencode(data)
         #request = urllib.request.Request(url, data, self.headers)
         self.headers['User-Agent'] = random.choice(BROWSERS)
-        proxy = next(self.proxies)
+        proxy = {next(self.proxies)}
         time.sleep(randint(1,5))
         r = requests.get(url,headers=self.headers,proxies = proxy)
         count = 0
@@ -169,6 +169,7 @@ class Browser(object):
             self.headers['User-Agent'] = random.choice(BROWSERS)
             time.sleep(randint(1,5))
             r = requests.get(url,headers=self.headers,proxies = proxy)
+            count+=1
             
         if r.status_code == 200:
             return r.content
