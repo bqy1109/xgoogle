@@ -174,7 +174,7 @@ class Browser(object):
         if r.status_code == 200:
             return r.content
         else:
-            return 1
+            print("All proxies die, google dominates me!")
         #try:
         #    response = self.opener.open(request)
         #    return response.read()
