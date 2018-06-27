@@ -23,6 +23,7 @@ from lxml.html import fromstring
 from itertools import cycle
 import traceback
 import time
+from random import randint
 
 def get_proxies():
     url = 'https://free-proxy-list.net/'
