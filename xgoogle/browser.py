@@ -167,7 +167,7 @@ class Browser(object):
         r = requests.get(url,headers=self.headers,proxies = proxy)
         count = 0
         while r.status_code == 503 and count <10:
-             proxy = {"http":next(self.proxies)}
+            proxy = {"http":next(self.proxies)}
             self.headers['User-Agent'] = random.choice(BROWSERS)
             time.sleep(randint(1,5))
             r = requests.get(url,headers=self.headers,proxies = proxy)
