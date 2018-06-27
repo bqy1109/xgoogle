@@ -161,16 +161,16 @@ class Browser(object):
         #if data: data = urllib.urlencode(data)
         #request = urllib.request.Request(url, data, self.headers)
         self.headers['User-Agent'] = random.choice(BROWSERS)
-        for i in range(randint(0,4)):
+        for i in range(randint(1,4)):
             single_proxy = {"http":next(self.proxies)}
         time.sleep(randint(1,5))
         r = requests.get(url,headers=self.headers,proxies = single_proxy)
         count = 0
         while r.status_code == 503 and count <10:
-            proxy = {"http":next(self.proxies)}
+            single_proxy = {"http":next(self.proxies)}
             self.headers['User-Agent'] = random.choice(BROWSERS)
             time.sleep(randint(1,5))
-            r = requests.get(url,headers=self.headers,proxies = proxy)
+            r = requests.get(url,headers=self.headers,proxies = single_proxy)
             count+=1
             
         if r.status_code == 200:
