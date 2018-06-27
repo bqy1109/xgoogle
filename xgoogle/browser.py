@@ -35,8 +35,8 @@ def get_proxies():
             proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
             proxies.add(proxy)
     return proxies
-proxies = get_proxies()
-proxy_pool = cycle(proxies)
+proxies_list = get_proxies()
+proxy_pool = cycle(proxies_list)
 
 
 BROWSERS = (
@@ -129,7 +129,7 @@ class PoolHTTPHandler(urllib.request.HTTPHandler):
 class Browser(object):
     """Provide a simulated browser object.
     """
-    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxies = proxy_pool):
+    def __init__(self, user_agent=BROWSERS[0], debug=False, use_pool=False, proxies = proxy_list):
         self.headers = {
             'User-Agent': user_agent,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -138,7 +138,7 @@ class Browser(object):
         }
         self.debug = debug
         self._cj = http.cookiejar.CookieJar()
-        self.proxies = proxies
+        self.proxies = cycle(proxies_list)
 
         self.handlers = [PoolHTTPHandler]
         self.handlers.append(urllib.request.HTTPCookieProcessor(self._cj))
