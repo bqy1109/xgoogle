@@ -164,19 +164,19 @@ class Browser(object):
         for i in range(randint(1,4)):
             single_proxy = {"http":next(self.proxies)}
         time.sleep(randint(1,5))
-        r = requests.get(url,headers=self.headers,proxies = single_proxy)
+        r = requests.get(url,headers=self.headers)#,proxies = single_proxy)
         count = 0
         while r.status_code == 503 and count <10:
             single_proxy = {"http":next(self.proxies)}
             self.headers['User-Agent'] = random.choice(BROWSERS)
             time.sleep(randint(1,5))
-            r = requests.get(url,headers=self.headers,proxies = single_proxy)
+            r = requests.get(url,headers=self.headers)#,proxies = single_proxy)
             count+=1
             
         if r.status_code == 200:
             return r.content
         else:
-            print("All proxies die, google dominates me!")
+            print("I'm detected, google dominates me!")
         #try:
         #    response = self.opener.open(request)
         #    return response.read()
